@@ -1,3 +1,5 @@
+<img src="./images/logo.png" alt="盗铜工具" width="96">
+
 # 盗铜工具 Thieving Copper
 
 [English](./README.en.md)

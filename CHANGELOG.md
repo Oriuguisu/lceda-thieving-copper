@@ -1,5 +1,15 @@
 # 更新日志 / Changelog
 
+## v1.0.1
+
+- 增加扩展图标，满足扩展广场的上架要求
+- 图标由 `npm run logo` 程序化生成，图形即功能：一条铜色走线与两侧按安全间距自动避开它的盗铜块
+
+---
+
+- Added the extension logo required by the extension plaza
+- The logo is generated programmatically via `npm run logo`; the artwork itself shows what the extension does: a copper track with thieving blocks keeping clear of it
+
 ## v1.0.0
 
 首个发布版本 / First release.

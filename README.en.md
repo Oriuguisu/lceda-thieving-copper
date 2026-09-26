@@ -1,3 +1,5 @@
+<img src="./images/logo.png" alt="Thieving Copper" width="96">
+
 # Thieving Copper
 
 [简体中文](./README.md)

@@ -10,11 +10,11 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
  * 检查打包结果：列出包内文件，并确认内联窗口的关键内容都在。
  */
 async function main() {
-	const [eext] = fs
-		.readdirSync(path.join(root, 'build/dist'))
-		.filter(name => name.endsWith('.eext'));
-	if (!eext) {
-		throw new Error('build/dist 下没有找到 .eext，请先运行 npm run build');
+	// 按当前 extension.json 的版本精确定位，避免 build/dist 里堆积的旧包干扰检查。
+	const extension = JSON.parse(fs.readFileSync(path.join(root, 'extension.json'), 'utf8'));
+	const eext = `${extension.name}_v${extension.version}.eext`;
+	if (!fs.existsSync(path.join(root, 'build/dist', eext))) {
+		throw new Error(`build/dist 下没有找到 ${eext}，请先运行 npm run build`);
 	}
 
 	const zip = await JSZip.loadAsync(fs.readFileSync(path.join(root, 'build/dist', eext)));
@@ -23,6 +23,20 @@ async function main() {
 		if (!entry.dir) {
 			console.log(`  ${name}  ${(await entry.async('string')).length} chars`);
 		}
+	}
+
+	const manifest = JSON.parse(await zip.files['extension.json'].async('string'));
+	const logoPath = manifest.images?.logo?.replace(/^\.\//, '');
+	const logo = logoPath ? zip.files[logoPath] : undefined;
+	if (!logo) {
+		throw new Error(`扩展包里缺少 extension.json 指定的图标：${manifest.images?.logo ?? '(未声明)'}`);
+	}
+	const logoBytes = await logo.async('nodebuffer');
+	// PNG 的 IHDR 紧跟 8 字节签名，宽高各 4 字节大端。
+	const logoSize = { width: logoBytes.readUInt32BE(16), height: logoBytes.readUInt32BE(20) };
+	console.log(`logo: ${logoPath} ${logoSize.width}x${logoSize.height} ${logoBytes.length} bytes`);
+	if (logoSize.width < 200 || logoSize.height < 200 || logoSize.width !== logoSize.height) {
+		throw new Error('扩展广场要求图标为 1:1 且不小于 200×200。');
 	}
 
 	const html = await zip.files['iframe/index.html'].async('string');

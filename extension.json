@@ -1,0 +1,58 @@
+{
+	"name": "lceda-thieving-copper",
+	"uuid": "7c3f9b21d48e4a5f9d0e6b8c1a2f3d40",
+	"displayName": "盗铜工具",
+	"description": "在 PCB 空旷区域自动铺设盗铜（Thieving Copper），自动避让走线、焊盘、过孔、铺铜与板边。",
+	"version": "1.0.0",
+	"publisher": "Oriuguisu",
+	"engines": {
+		"eda": "^3.2.0"
+	},
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "extension-store",
+		"url": "https://github.com/Oriuguisu/lceda-thieving-copper"
+	},
+	"categories": "Other",
+	"keywords": [
+		"PCB",
+		"Thieving",
+		"Copper",
+		"Balance"
+	],
+	"homepage": "https://github.com/Oriuguisu/lceda-thieving-copper",
+	"bugs": "https://github.com/Oriuguisu/lceda-thieving-copper/issues",
+	"activationEvents": {},
+	"entry": "./dist/index",
+	"dependentExtensions": {},
+	"headerMenus": {
+		"pcb": [
+			{
+				"id": "ThievingCopper",
+				"title": "盗铜工具",
+				"menuItems": [
+					{
+						"id": "ThievingPanel",
+						"title": "盗铜面板...",
+						"registerFn": "openThievingPanel"
+					},
+					{
+						"id": "ThievingQuick",
+						"title": "快速盗铜（对话框）...",
+						"registerFn": "quickThieving"
+					},
+					{
+						"id": "ThievingRemove",
+						"title": "删除本插件生成的盗铜...",
+						"registerFn": "removeThieving"
+					},
+					{
+						"id": "ThievingAbout",
+						"title": "使用说明",
+						"registerFn": "about"
+					}
+				]
+			}
+		]
+	}
+}

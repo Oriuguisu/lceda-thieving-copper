@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>盗铜工具</title>
+	<style>
+		:root {
+			--background: #ffffff;
+			--surface: #f6f7f9;
+			--border: #d9dde3;
+			--text: #1f2329;
+			--muted: #6b7280;
+			--accent: #1f7ae0;
+			--accent-text: #ffffff;
+			--danger: #c8452f;
+			--track: #e4e7eb;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--background: #22252a;
+				--surface: #2a2e35;
+				--border: #3a3f47;
+				--text: #e6e8eb;
+				--muted: #9aa2ad;
+				--accent: #4c9aff;
+				--accent-text: #10131a;
+				--danger: #ff7a66;
+				--track: #3a3f47;
+			}
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			padding: 12px;
+			background: var(--background);
+			color: var(--text);
+			font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+			font-size: 13px;
+			line-height: 1.5;
+		}
+
+		.card {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 10px 12px;
+			margin-bottom: 10px;
+		}
+
+		.card > h2 {
+			font-size: 13px;
+			font-weight: 600;
+			margin: 0 0 8px;
+		}
+
+		.row {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 8px 12px;
+		}
+
+		.row.triple {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		label.field {
+			display: flex;
+			flex-direction: column;
+			gap: 3px;
+			font-size: 12px;
+			color: var(--muted);
+		}
+
+		input[type="number"],
+		input[type="text"],
+		select {
+			width: 100%;
+			padding: 4px 6px;
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			background: var(--background);
+			color: var(--text);
+			font-size: 13px;
+			font-family: inherit;
+		}
+
+		input:focus,
+		select:focus {
+			outline: 1px solid var(--accent);
+		}
+
+		.checkbox {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 12px;
+			color: var(--text);
+		}
+
+		.layers {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px 14px;
+			min-height: 20px;
+			color: var(--muted);
+		}
+
+		.actions {
+			display: flex;
+			gap: 8px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		button {
+			padding: 5px 14px;
+			border-radius: 4px;
+			border: 1px solid var(--border);
+			background: var(--background);
+			color: var(--text);
+			font-family: inherit;
+			font-size: 13px;
+			cursor: pointer;
+		}
+
+		button:hover:not(:disabled) {
+			border-color: var(--accent);
+		}
+
+		button:disabled {
+			opacity: 0.5;
+			cursor: default;
+		}
+
+		button.primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: var(--accent-text);
+			font-weight: 600;
+		}
+
+		button.link {
+			border: none;
+			background: none;
+			color: var(--accent);
+			padding: 2px 0;
+			text-decoration: underline;
+		}
+
+		.progress {
+			height: 4px;
+			border-radius: 2px;
+			background: var(--track);
+			overflow: hidden;
+			margin: 10px 0 6px;
+		}
+
+		.progress > span {
+			display: block;
+			height: 100%;
+			width: 0;
+			background: var(--accent);
+			transition: width 0.2s ease;
+		}
+
+		#status {
+			font-size: 12px;
+			color: var(--muted);
+			min-height: 18px;
+			white-space: pre-wrap;
+		}
+
+		#status.error {
+			color: var(--danger);
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.hint {
+			font-size: 11px;
+			color: var(--muted);
+			margin-top: 6px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="card">
+		<h2>目标铜层</h2>
+		<div class="layers" id="field-layers">正在读取图层…</div>
+	</div>
+
+	<div class="card">
+		<h2>铜块</h2>
+		<div class="row triple">
+			<label class="field">形状
+				<select id="field-shape">
+					<option value="square" selected>正方形</option>
+					<option value="circle">圆形</option>
+					<option value="diamond">菱形</option>
+				</select>
+			</label>
+			<label class="field">尺寸 (mm)
+				<input id="field-block-size" type="number" min="0.05" step="0.05" value="1">
+			</label>
+			<label class="field">中心间距 (mm)
+				<input id="field-pitch" type="number" min="0.1" step="0.1" value="2">
+			</label>
+		</div>
+		<div class="row" style="margin-top: 8px;">
+			<label class="field">排列方式
+				<select id="field-pattern">
+					<option value="staggered" selected>交错排列</option>
+					<option value="grid">正交网格</option>
+				</select>
+			</label>
+			<label class="field">网络（留空为不连接）
+				<input id="field-net" type="text" placeholder="例如 GND" value="">
+			</label>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>安全间距</h2>
+		<div class="row">
+			<label class="field">与既有铜箔 (mm)
+				<input id="field-clearance" type="number" min="0" step="0.05" value="0.5">
+			</label>
+			<label class="field">与板边 (mm)
+				<input id="field-board-clearance" type="number" min="0" step="0.1" value="1">
+			</label>
+		</div>
+		<label class="checkbox" style="margin-top: 8px;">
+			<input id="field-avoid-keepouts" type="checkbox" checked>避开铺铜/填充禁止区
+		</label>
+		<label class="checkbox" style="margin-top: 6px;">
+			<input id="field-avoid-components" type="checkbox" checked>避开器件轮廓（含封装内部铜）
+		</label>
+	</div>
+
+	<div class="card">
+		<h2>铺设范围</h2>
+		<label class="field" style="max-width: 260px;">范围模式
+			<select id="field-range-mode">
+				<option value="board" selected>整板空白区域</option>
+				<option value="edge">仅板边环形区域</option>
+				<option value="rectangle">仅指定矩形区域</option>
+			</select>
+		</label>
+
+		<div class="row hidden" id="group-edge" style="margin-top: 8px;">
+			<label class="field">环形带宽度 (mm)
+				<input id="field-edge-margin" type="number" min="0.1" step="0.5" value="5">
+			</label>
+		</div>
+
+		<div class="hidden" id="group-rectangle" style="margin-top: 8px;">
+			<div class="row triple">
+				<label class="field">左 X (mm)
+					<input id="field-rect-min-x" type="number" step="0.1" value="0">
+				</label>
+				<label class="field">下 Y (mm)
+					<input id="field-rect-min-y" type="number" step="0.1" value="0">
+				</label>
+				<label class="field">右 X (mm)
+					<input id="field-rect-max-x" type="number" step="0.1" value="0">
+				</label>
+			</div>
+			<div class="row triple" style="margin-top: 8px;">
+				<label class="field">上 Y (mm)
+					<input id="field-rect-max-y" type="number" step="0.1" value="0">
+				</label>
+			</div>
+			<button class="link" id="button-read-selection" type="button">读取当前选中对象的外框</button>
+			<div class="hint">坐标为 PCB 画布坐标，单位毫米。</div>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>高级</h2>
+		<div class="row">
+			<label class="field">最多生成数量
+				<input id="field-max-blocks" type="number" min="1" step="100" value="5000">
+			</label>
+			<label class="field">空白判定精度
+				<select id="field-precision">
+					<option value="0.02">0.02 mm（最准，最慢）</option>
+					<option value="0.05" selected>0.05 mm（推荐）</option>
+					<option value="0.1">0.1 mm（快）</option>
+					<option value="0.2">0.2 mm（最快，粗略）</option>
+				</select>
+			</label>
+		</div>
+		<label class="checkbox" style="margin-top: 8px;">
+			<input id="field-lock" type="checkbox">创建后锁定盗铜图元
+		</label>
+	</div>
+
+	<div class="progress"><span id="progress-bar"></span></div>
+	<div id="status">准备就绪。</div>
+
+	<div class="actions" style="margin-top: 10px;">
+		<button class="primary" id="button-generate" type="button">生成盗铜</button>
+		<button id="button-preview" type="button">仅预览数量</button>
+		<button id="button-close" type="button">关闭</button>
+	</div>
+
+	<div class="actions" style="margin-top: 6px;">
+		<button id="button-remove" type="button">删除本插件记录的盗铜</button>
+		<button id="button-remove-all" type="button">按尺寸删除全部盗铜</button>
+	</div>
+	<div class="hint">
+		“按尺寸删除”会扫描上面勾选的铜层，删掉外框尺寸与“铜块尺寸”一致的单个填充，用于清理没有记录的盗铜。
+		动手前请确认铜层和尺寸填对了，你自己画的同尺寸小填充也会被算进去。
+	</div>
+
+	<script src="./app.js"></script>
+	<!-- INLINE_SCRIPT -->
+</body>
+
+</html>

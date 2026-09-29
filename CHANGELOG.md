@@ -1,5 +1,17 @@
 # 更新日志 / Changelog
 
+## v1.0.2
+
+- README 增加功能演示图：示例板铺设盗铜前后的对比
+- README 改为纯 Markdown，不再使用 HTML 标签
+- 修复存储接口的调用方式，避免在不提供该接口的环境下同步抛错中断生成流程
+
+---
+
+- Added demo images to the README: the sample board before and after thieving
+- Rewrote the README in plain Markdown, no HTML tags
+- Fixed how the storage APIs are called so a missing API can no longer abort generation with a synchronous throw
+
 ## v1.0.1
 
 - 增加扩展图标，满足扩展广场的上架要求

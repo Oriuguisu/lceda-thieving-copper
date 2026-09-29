@@ -76,6 +76,26 @@ function distanceToObstacle(point: Point, obstacle: Obstacle): number {
 }
 
 /**
+ * 真实生成一次，用于制作演示素材或人工验收。
+ *
+ * @remarks 会在当前文档创建图元，只应在演示板上运行。
+ */
+export async function generateForDemo(overrides: Record<string, unknown> = {}): Promise<unknown> {
+	const layers = await listCopperLayers();
+	const settings = normalizeSettings({
+		layers: layers.length > 0 ? [layers[0].id] : [1],
+		...overrides,
+	});
+
+	const messages: Array<string> = [];
+	const outcome = await generateThieving(settings, (percent, message) => {
+		messages.push(`${Math.round(percent)}% ${message}`);
+	});
+
+	return { settings, outcome, messages };
+}
+
+/**
  * 只读自检：在真实 PCB 上跑通板框识别、障碍收集与空位计算，不创建任何图元，
  * 并用解析式距离计算独立复核栅格遮罩给出的候选位置。
  *

@@ -1,3 +1,5 @@
+import { invokeOptional } from './api';
+
 const SETTINGS_KEY = 'thieving-settings';
 const RECORD_KEY_PREFIX = 'thieving-blocks:';
 
@@ -121,7 +123,7 @@ export function loadSettings(): ThievingSettings {
 }
 
 export async function saveSettings(settings: ThievingSettings): Promise<void> {
-	await eda.sys_Storage.setExtensionUserConfig(SETTINGS_KEY, settings).catch(() => false);
+	await invokeOptional(eda.sys_Storage, 'setExtensionUserConfig', SETTINGS_KEY, settings);
 }
 
 function recordKey(documentUuid: string): string {
@@ -140,9 +142,9 @@ export function loadRecords(documentUuid: string): Array<ThievingRecord> {
 
 export async function appendRecord(documentUuid: string, record: ThievingRecord): Promise<void> {
 	const records = [...loadRecords(documentUuid), record].slice(-20);
-	await eda.sys_Storage.setExtensionUserConfig(recordKey(documentUuid), records).catch(() => false);
+	await invokeOptional(eda.sys_Storage, 'setExtensionUserConfig', recordKey(documentUuid), records);
 }
 
 export async function clearRecords(documentUuid: string): Promise<void> {
-	await eda.sys_Storage.deleteExtensionUserConfig(recordKey(documentUuid)).catch(() => false);
+	await invokeOptional(eda.sys_Storage, 'deleteExtensionUserConfig', recordKey(documentUuid));
 }

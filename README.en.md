@@ -1,5 +1,3 @@
-<img src="./images/logo.png" alt="Thieving Copper" width="96">
-
 # Thieving Copper
 
 [简体中文](./README.md)
@@ -16,6 +14,16 @@ An EasyEDA Pro (JLCEDA Pro) extension that fills the empty areas of a PCB with t
 - 👀 **Preview only** — runs the full analysis without creating anything, so you can try parameters first
 - 🧹 **Two ways to remove** — undo precisely from the generation record, or clean up unrecorded blocks by size
 - 💾 **Settings are remembered** — the panel reopens with your last parameters
+
+## Demo
+
+A 40×30 mm sample board with SMD pads, a pin header, fan-out tracks, two power tracks, a round cutout and a rounded slot:
+
+![Sample board before thieving](./images/demo-before.png)
+
+Thieving copper added to the top layer with the default settings (1 mm squares, 2 mm pitch, 0.5 mm copper clearance, 1 mm board clearance, staggered), producing 144 blocks in one run. Tracks, pads, both cutouts and the board edge all keep their clearance automatically:
+
+![Sample board after thieving](./images/demo-after.png)
 
 ## Installation
 
@@ -75,7 +83,7 @@ npm run build
 
 The extension package is written to `build/dist/lceda-thieving-copper_vX.Y.Z.eext`. `npm run verify` checks that the package contents and the key parts of the inline window are present, and `npm run debug` starts watch mode with hot push.
 
-The whole `iframe/` directory is a build artefact: the panel source is `src/ui/index.html`, and the build inlines the bundled script into it to produce `iframe/index.html`. EasyEDA's inline window does not reliably fetch resources referenced by `<script src>`, which leaves the panel stuck in its initial state; both the external and the inline copy are kept, and the script guards itself with a global flag so it only initialises once.
+The whole `iframe/` directory is a build artefact: the panel source is `src/ui/index.html`, and the build inlines the bundled script into it to produce `iframe/index.html`. EasyEDA's inline window does not reliably fetch externally referenced scripts, which leaves the panel stuck in its initial state; both the external and the inline copy are kept, and the script guards itself with a global flag so it only initialises once.
 
 ## Read-only self-check
 

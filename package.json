@@ -1,7 +1,7 @@
 {
 	"name": "lceda-thieving-copper",
 	"type": "module",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"private": true,
 	"description": "嘉立创 EDA 专业版盗铜（Thieving Copper）扩展",
 	"author": "Oriuguisu",
